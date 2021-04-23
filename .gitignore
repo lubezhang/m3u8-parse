@@ -1,0 +1,12 @@
+.DS_Store
+node_modules/
+build/
+test-data/
+data/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+test/*/coverage
+test/*/__snapshots__
+test/*/reports
+selenium-debug.log
