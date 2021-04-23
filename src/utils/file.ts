@@ -3,10 +3,17 @@ import * as fs from 'fs';
 import * as os from 'os';
 import { getUUID } from './string';
 
+/**
+ * 获取一个临时文件链接
+ */
 export const getTmpFilePath = (): string => {
     return path.resolve(os.tmpdir(), getUUID());
 }
 
+/**
+ * 删除一个文件，不能删除包含文件的目录
+ * @param filePath
+ */
 export const delFile = (filePath: string): void => {
     fs.unlinkSync(filePath); //删除文件
 }
@@ -24,7 +31,7 @@ export const moveFile = (srcFile: string, distFile: string): void => {
  * 递归创建目录 同步方法
  * @param folderPath 目录路径
  */
-export const mkdirsSync = (folderPath: string): any => {
+export const mkdirsSync = (folderPath: string): boolean | undefined => {
     if (fs.existsSync(folderPath)) {
         return true;
     } else {

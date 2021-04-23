@@ -1,32 +1,29 @@
-import { encryptAes, decryptAes, decryptFileAes } from '../../src/parse';
-describe('单独测试 加/解密函数', () => {
-    const key = 'ABCDEFGHIJKLMNOP';
-    const iv = '0000000000000001';
+import { HLSProtocol, EnumProtocolTag, EnumPlayListType } from '../../src/types';
+import { parseProtocol } from '../../src/parse/parse';
+import { m3u8Master, m3u8Vod } from './test.data';
 
-    test('测试 AES 加密函数', () => {
-        const res = 'fb378cce34050271f56bd67d9cb411d1';
-        const data = Buffer.from('11');
-        const objencrypt = encryptAes(data, key, iv);
+describe('解析协议，src/parse/parse', () => {
+    test('将字符串形式的文件内容结构化成协议对象，主文件', () => {
+        const body: HLSProtocol = parseProtocol(m3u8Master);
+        expect(body).not.toBeUndefined();
+        expect(body.EXTM3U).toBe(EnumProtocolTag.EXTM3U);
+        expect(body.EXT_X_STREAM_INF).not.toBeUndefined();
 
-        expect(objencrypt.toString('hex')).toBe(res);
+        // console.log(body);
     });
 
-    test('测试 AES 解密函数', () => {
-        const res = '11';
-        const src = 'fb378cce34050271f56bd67d9cb411d1';
-        const data = Buffer.from(src, 'hex');
-        const objdecrypt = decryptAes(data, key, iv);
+    test('将字符串形式的文件内容结构化成协议对象，点播文件', () => {
+        const body: HLSProtocol = parseProtocol(m3u8Vod);
+        expect(body).not.toBeUndefined();
+        expect(body.EXTM3U).toBe(EnumProtocolTag.EXTM3U);
 
-        expect(objdecrypt.toString()).toBe(res);
-    });
-});
+        expect(body.EXT_X_PLAYLIST_TYPE).toBe(EnumPlayListType.Vod);
 
-describe('视频片段解密', () => {
-    const key = 'e74dfaa3fbf8c9ed';
-    const iv = '0000000000000000';
-    const filePath = '/Users/zhangqinghong/study/nodejs/m3u8-parse/test-data/0.ts'
-    test('解密视频片段 - AES-128', () => {
-        decryptFileAes(filePath, key, iv);
-        expect(1).toBe(1);
+        expect(body.EXTINF).not.toBeUndefined();
+        expect(body.EXTINF).not.toHaveLength(0)
+        if (body.EXTINF) {
+            expect(body.EXTINF[0].Tag).toBe('#EXTINF');
+            expect(body.EXTINF[0].Attrs).toBe('#EXTINF:4.128,');
+        }
     });
 });

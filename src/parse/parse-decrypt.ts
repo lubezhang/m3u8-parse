@@ -7,9 +7,10 @@ const CONST_BASE_DEFAULT_ALGORITHM = 'aes-128-cbc';
 const CONST_BASE_DEFAULT_IV = '0000000000000000';
 
 /**
- * 对加密的TS文件进行解密
+ * 对使用AES加密的文件进行解密，默认使用aes-128-cbc解密
  * @param srcTsPath 加密的TS文件路径
- * @param encryption 加密信息
+ * @param key 加密的密钥
+ * @param iv 机密偏移量（可选）。默认：0000000000000000
  */
 export const decryptFileAes = (srcFilePath: string, key: string, iv = CONST_BASE_DEFAULT_IV): void => {
     srcFilePath = path.resolve(srcFilePath);
