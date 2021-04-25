@@ -46,11 +46,6 @@ export interface HLSProtocolParam {
     Params?: any
 }
 
-export interface M3u8Body {
-    playlistType: PlayListType;
-    // streamInf?: Array<ExtStreamInf>;
-    // tsList?: Array<ExtInf>;
-}
 
 export interface Record {
     /** 协议标签名 */
@@ -82,4 +77,12 @@ export interface ExtXKey extends Record {
     URI?: string;
     KEY?: string;
     IV?: string;
+}
+/**
+ * @deprecated
+ */
+export interface M3u8Body {
+    playlistType: PlayListType;
+    // streamInf?: Array<ExtStreamInf>;
+    // tsList?: Array<ExtInf>;
 }
