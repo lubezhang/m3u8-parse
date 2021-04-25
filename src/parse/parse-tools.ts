@@ -1,40 +1,45 @@
-import { HLSProtocolParam, EnumProtocolTag } from '../types';
+import { HLSProtocolParam, EnumProtocolTag, ProtocolTagType } from '../types';
+
 /**
  * 将字符串形式的协议，解构成方面使用的结构化对象
- * @param strParams
+ * @param strProtocol
  */
-export const destructureParams = (strParams: string): HLSProtocolParam => {
-    const protocol: HLSProtocolParam = {}
-    if (strParams && typeof strParams === 'string') {
-        if (strParams.charAt(0) !== '#') {
-            return protocol;
+export const destructureParams = (strProtocol: string): HLSProtocolParam => {
+    const protocol: HLSProtocolParam = {
+        Tag: EnumProtocolTag.EXTM3U
+    };
+    const reg1 = /^#E[A-Z,0-9,-]*:?/;
+    if (reg1.test(strProtocol)) {
+        // 获取协议中标签的名称
+        let arrayProtocol = strProtocol.match(reg1);
+        if (arrayProtocol && arrayProtocol[0]) {
+            protocol.Tag = arrayProtocol[0].replace(':', '') as ProtocolTagType;
         }
-        const types = strParams.split(':');
-        if (Array.isArray(types) && types.length > 0) {
-            protocol.Tag = types[0] as EnumProtocolTag; // 解析标签
-            if (types.length > 1) { // 解析参数
-                types[1] = strParams.replace(`${protocol.Tag}:`, '')
-                const params = types[1].split(',');
-                let protocolParams: any;
-                if (params[0].indexOf('=') >= 0) { // 参数是key：value的形式
-                    protocolParams = {};
-                    params.forEach((item) => {
-                        if (item) {
-                            const tmp = item.split('=');
-                            protocolParams[tmp[0]] = tmp[1].replace(/[',"]/g, '');
-                        }
-                    });
-                } else { // 数组形式的参数
-                    protocolParams = params;
-                }
 
-                protocol.Params = protocolParams;
+        // 获取协议中的参数
+        arrayProtocol = strProtocol.split(reg1);
+        let strParams = '';
+        if (arrayProtocol.length >= 2) {
+            strParams = arrayProtocol[1];
+        }
+        const arratParams = strParams.split(/,/);
+        if (arratParams[0].indexOf('=') >= 0) { // 参数是key：value的形式
+            protocol.Params = {};
+            arratParams.forEach((item) => {
+                if (item) {
+                    const tmp = item.split('=');
+                    protocol.Params[tmp[0]] = tmp[1].replace(/[',"]/g, ''); // 替换掉数据中的'和"
+                }
+            });
+        } else { // 数组形式的参数
+            if (arratParams.some(item => item)) {
+                protocol.Params = arratParams;
+            } else {
+                protocol.Params = undefined;
             }
-        } else {
-            return protocol;
         }
     } else {
-        throw Error('参数为空，格式错误');
+        throw Error('协议格式错误')
     }
 
     return protocol;

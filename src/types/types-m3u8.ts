@@ -22,11 +22,19 @@ export enum EnumPlayListType {
     Live = 'live',
 }
 
+export type ProtocolTagType = EnumProtocolTag.EXTM3U
+    | EnumProtocolTag.EXTINF
+    | EnumProtocolTag.EXT_X_STREAM_INF
+    | EnumProtocolTag.EXT_X_PLAYLIST_TYPE
+    | EnumProtocolTag.EXT_X_ENDLIST
+    | EnumProtocolTag.EXT_X_KEY
+    ;
+
 export type PlayListType = EnumPlayListType.Master | EnumPlayListType.Vod | EnumPlayListType.Live ;
 export interface HLSProtocol {
     EXTM3U: string;
     EXT_X_PLAYLIST_TYPE?: PlayListType;
-    EXT_X_STREAM_INF?: Array<Record>;
+    EXT_X_STREAM_INF?: Array<ExtXStreamInf>;
     EXT_X_KEY?: Array<ExtXKey>;
     EXTINF?: Array<Extinf>;
     EXT_X_ENDLIST?: string;
@@ -34,7 +42,7 @@ export interface HLSProtocol {
 
 /** HLS 协议参数 */
 export interface HLSProtocolParam {
-    Tag?: EnumProtocolTag;
+    Tag: ProtocolTagType;
     Params?: any
 }
 
@@ -45,11 +53,19 @@ export interface M3u8Body {
 }
 
 export interface Record {
-    Tag: EnumProtocolTag;
+    /** 协议标签名 */
+    Tag: ProtocolTagType;
+    /** 协议的原始字符串形式 */
     Attrs: string;
+    /** 协议对应的数据。一般是url */
     Value?: string;
 }
 
+export interface ExtXStreamInf extends Record {
+    BANDWIDTH?: string;
+    'PROGRAM-ID'?: string;
+    CODECS?: string;
+}
 export interface Extinf extends Record {
     /** 每个切片的实际时长。单位：秒 */
     Duration: number;

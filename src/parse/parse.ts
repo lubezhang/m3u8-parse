@@ -51,12 +51,13 @@ const parseExtXStreamInf = (protocol: HLSProtocol, strProtocol: string, nextVal:
     if (!protocol.EXT_X_STREAM_INF) {
         protocol.EXT_X_STREAM_INF = [];
     }
+    const params = destructureParams(strProtocol).Params;
     const val = nextVal ? nextVal.value[1] : undefined;
-    protocol.EXT_X_STREAM_INF.push({
+    protocol.EXT_X_STREAM_INF.push(Object.assign({}, params, {
         Tag: EnumProtocolTag.EXT_X_STREAM_INF,
         Attrs: strProtocol,
         Value: val
-    });
+    }));
 }
 
 const parseExtinf = (protocol: HLSProtocol, strProtocol: string, nextVal?: any): void => {
@@ -81,7 +82,11 @@ const parseExtXKey = (protocol: HLSProtocol, strProtocol: string): void => {
     }
 
     const paramsKey = destructureParams(strProtocol).Params;
-    protocol.EXT_X_KEY.push(paramsKey);
+    // protocol.EXT_X_KEY.push(paramsKey);
+    protocol.EXT_X_KEY.push(Object.assign({}, paramsKey, {
+        Tag: EnumProtocolTag.EXT_X_STREAM_INF,
+        Attrs: strProtocol
+    }));
 }
 
 export const parse = (constent: string): M3u8Body => {
