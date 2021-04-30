@@ -1,1 +1,4 @@
-# m3u8-parse
+# Usage
+```
+var mercury = require('hls-mercury');
+```

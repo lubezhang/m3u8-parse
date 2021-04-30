@@ -1,4 +1,4 @@
-import { encryptAes, decryptAes, decryptFileAes } from '../../src/parse';
+import { encryptAes, decryptAes } from '../../src/parse';
 describe('单独测试 加/解密函数', () => {
     const key = 'ABCDEFGHIJKLMNOP';
     const iv = '0000000000000001';
@@ -23,9 +23,9 @@ describe('单独测试 加/解密函数', () => {
 
 describe('视频片段解密', () => {
     jest.setTimeout(99999);
-    const key = 'e74dfaa3fbf8c9ed';
-    const iv = '0000000000000000';
-    const filePath = '/Users/zhangqinghong/study/nodejs/m3u8-parse/test-data/0.ts'
+    // const key = 'e74dfaa3fbf8c9ed';
+    // const iv = '0000000000000000';
+    // const filePath = '/Users/zhangqinghong/study/nodejs/m3u8-parse/test-data/0.ts'
     // test('解密视频片段(同步) - AES-128', () => {
     //     decryptFileAesSync(filePath, key, iv);
     //     expect(1).toBe(1);
