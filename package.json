@@ -4,6 +4,10 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lubezhang/mercury.git"
+  },
   "scripts": {
     "commit": "git-cz",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
