@@ -1,13 +1,14 @@
 {
-  "name": "m3u8-parse",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "mercury",
+  "version": "0.0.1",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "license": "MIT",
   "scripts": {
     "commit": "git-cz",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "start": "ts-node src/start",
-    "build": "rm -rf build && tsc",
+    "build": "rm -rf lib && tsc",
     "test": "jest --color",
     "test:watch": "npm run test -- --watchAll"
   },

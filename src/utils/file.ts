@@ -28,6 +28,15 @@ export const moveFile = (srcFile: string, distFile: string): void => {
 }
 
 /**
+ * 复制文件
+ * @param srcFile {string} 源文件路径
+ * @param distFile {string} 目的文件路径
+ */
+export const copyFile = (srcFile: string, distFile: string): void => {
+    fs.writeFileSync(distFile, fs.readFileSync(srcFile));
+}
+
+/**
  * 递归创建目录 同步方法
  * @param folderPath 目录路径
  */
