@@ -1,5 +1,5 @@
 {
-  "name": "mercury",
+  "name": "hls-mercury",
   "version": "0.0.1",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -37,5 +37,8 @@
   "dependencies": {
     "crypto-js": "^4.0.0",
     "lodash": "^4.17.20"
-  }
+  },
+  "files": [
+    "lib"
+  ]
 }
