@@ -60,21 +60,27 @@ export interface ExtXStreamInf extends Record {
     BANDWIDTH?: string;
     'PROGRAM-ID'?: string;
     CODECS?: string;
+    /** 视频流协议文件链接 */
+    Url: string;
 }
 export interface Extinf extends Record {
+    Index?: number;
     /** 每个切片的实际时长。单位：秒 */
     Duration: number;
     /** 片的描述 */
     Title?: string;
     /** 每片的链接 */
     Url: string;
+    /** 当前文件在加密信息数组中的索引 */
+    EncryptIndex?: number
 }
 
 export interface ExtXKey extends Record {
+    Index?: number;
     /** 文件加密方式 */
     METHOD: string;
     /** 密钥链接 */
-    URI?: string;
+    URI: string;
     KEY?: string;
     IV?: string;
 }

@@ -1,11 +1,11 @@
 import { M3u8Body, EnumPlayListType, HLSProtocol, EnumProtocolTag } from '../types/types-m3u8';
-import { structureContent, destructureParams } from './parse-tools';
+import { structureContent, destructureParams, joinUrl } from './parse-tools';
 
-export const parseProtocol = (constent: string): HLSProtocol => {
+export const parseProtocol = (constent: string, masterUrl?: string): HLSProtocol => {
     const protocol: HLSProtocol = {
         EXTM3U: EnumProtocolTag.EXTM3U
     };
-    const list: IterableIterator<[number, string]> = structureContent(constent).entries();
+    const list: IterableIterator<[number, string]> = structureContent(constent).entries(); // 将数组转成迭代器
     const reg = /(^#E([^:])+)/; // 匹配协议标签
     // const contents = list;
     for (let index = 0; true; index++) {
@@ -28,14 +28,14 @@ export const parseProtocol = (constent: string): HLSProtocol => {
                     break;
                 // https://developer.apple.com/library/archive/technotes/tn2288/_index.html#//apple_ref/doc/uid/DTS40012238-CH1-BASIC_VARIANT_PLAYLIST
                 case EnumProtocolTag.EXT_X_STREAM_INF:
-                    parseExtXStreamInf(protocol, val[1], list.next());
+                    parseExtXStreamInf(protocol, val[1], list.next(), masterUrl);
                     break;
                 case EnumProtocolTag.EXT_X_PLAYLIST_TYPE:
                     const paramsType = destructureParams(val[1]);
                     protocol.EXT_X_PLAYLIST_TYPE = paramsType.Params[0];
                     break;
                 case EnumProtocolTag.EXTINF:
-                    parseExtinf(protocol, val[1], list.next());
+                    parseExtinf(protocol, val[1], list.next(), masterUrl);
                     break;
                 case EnumProtocolTag.EXT_X_KEY:
                     parseExtXKey(protocol, val[1]);
@@ -47,7 +47,14 @@ export const parseProtocol = (constent: string): HLSProtocol => {
     return protocol;
 }
 
-const parseExtXStreamInf = (protocol: HLSProtocol, strProtocol: string, nextVal: any): void => {
+/**
+ * 视频多码率描述
+ * @param protocol 协议对象
+ * @param strProtocol 协议原始内容
+ * @param nextVal 协议对应的值
+ * @param masterUrl master文件的URL
+ */
+const parseExtXStreamInf = (protocol: HLSProtocol, strProtocol: string, nextVal: any, masterUrl?: string): void => {
     if (!protocol.EXT_X_STREAM_INF) {
         protocol.EXT_X_STREAM_INF = [];
     }
@@ -56,11 +63,18 @@ const parseExtXStreamInf = (protocol: HLSProtocol, strProtocol: string, nextVal:
     protocol.EXT_X_STREAM_INF.push(Object.assign({}, params, {
         Tag: EnumProtocolTag.EXT_X_STREAM_INF,
         Attrs: strProtocol,
-        Value: val
+        Value: val,
+        Url: joinUrl(val, masterUrl)
     }));
 }
 
-const parseExtinf = (protocol: HLSProtocol, strProtocol: string, nextVal?: any): void => {
+/**
+ * 视频流分片数组
+ * @param protocol
+ * @param strProtocol
+ * @param nextVal
+ */
+const parseExtinf = (protocol: HLSProtocol, strProtocol: string, nextVal?: any, masterUrl?: string): void => {
     if (!protocol.EXTINF) {
         protocol.EXTINF = [];
     }
@@ -72,10 +86,16 @@ const parseExtinf = (protocol: HLSProtocol, strProtocol: string, nextVal?: any):
         Value: val,
         Duration: parseFloat(params[0]),
         Title: params[1] ? params[1] : '',
-        Url: val
+        Url: joinUrl(val, masterUrl),
+        EncryptIndex: protocol.EXT_X_KEY ? protocol.EXT_X_KEY.length - 1 : undefined
     });
 }
 
+/**
+ * 文件加密密钥
+ * @param protocol
+ * @param strProtocol
+ */
 const parseExtXKey = (protocol: HLSProtocol, strProtocol: string): void => {
     if (!protocol.EXT_X_KEY) {
         protocol.EXT_X_KEY = [];
@@ -84,11 +104,14 @@ const parseExtXKey = (protocol: HLSProtocol, strProtocol: string): void => {
     const paramsKey = destructureParams(strProtocol).Params;
     // protocol.EXT_X_KEY.push(paramsKey);
     protocol.EXT_X_KEY.push(Object.assign({}, paramsKey, {
-        Tag: EnumProtocolTag.EXT_X_STREAM_INF,
+        Tag: EnumProtocolTag.EXT_X_KEY,
         Attrs: strProtocol
     }));
 }
 
+/**
+ * @deprecated
+ */
 export const parse = (constent: string): M3u8Body => {
     const body: M3u8Body = {
         playlistType: EnumPlayListType.Master
