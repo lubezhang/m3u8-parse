@@ -7,7 +7,11 @@ import { getUUID } from './string';
  * 获取一个临时文件链接
  */
 export const getTmpFilePath = (): string => {
-    return path.resolve(os.tmpdir(), getUUID());
+    const tmpDir = path.resolve(os.tmpdir(), 'hls-mercury');
+    if (!fs.existsSync(tmpDir)) {
+        mkdirsSync(tmpDir);
+    }
+    return path.resolve(tmpDir, getUUID());
 }
 
 /**
