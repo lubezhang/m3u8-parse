@@ -46,21 +46,30 @@ export const decryptFileAes = (srcFilePath: string, key: string, iv = CONST_BASE
     return new Promise((resolve, reject) => {
         if (fs.existsSync(srcFilePath)) {
             const tmpFile = getTmpFilePath();
+            try {
+                const readStream = fs.createReadStream(srcFilePath);
+                const decipher: Decipher = createDecipheriv(CONST_BASE_DEFAULT_ALGORITHM, key, iv);
+                const writeStream: fs.WriteStream = fs.createWriteStream(tmpFile);
+                readStream.pipe<Decipher>(decipher).pipe(writeStream);
 
-            const read = fs.createReadStream(srcFilePath);
-            const decipher: Decipher = createDecipheriv(CONST_BASE_DEFAULT_ALGORITHM, key, iv);
-            const writeStream: fs.WriteStream = fs.createWriteStream(tmpFile);
-            read.pipe<Decipher>(decipher).pipe(writeStream);
+                readStream.on('error', function(error) { // 写完后，继续读取
+                    reject('文件解密失败, 读取源文件失败：' + error)
+                });
 
-            writeStream.on('finish', function() { // 写完后，继续读取
-                // moveFile(tmpFile, srcFilePath);
-                resolve(tmpFile);
-            });
+                writeStream.on('finish', function() { // 写完后，继续读取
+                    // moveFile(tmpFile, srcFilePath);
+                    readStream.close();
+                    writeStream.close();
+                    resolve(tmpFile);
+                });
 
-            writeStream.on('error', function(error) { // 写完后，继续读取
-                delFile(tmpFile);
+                writeStream.on('error', function(error) { // 写完后，继续读取
+                    delFile(tmpFile);
+                    reject('文件解密失败，写入文件失败：' + error)
+                });
+            } catch (error) {
                 reject('文件解密失败：' + error)
-            });
+            }
         } else {
             reject('文件不存在：' + srcFilePath);
         }
