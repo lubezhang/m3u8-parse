@@ -52,6 +52,10 @@ export const decryptFileAes = (srcFilePath: string, key: string, iv = CONST_BASE
                 const writeStream: fs.WriteStream = fs.createWriteStream(tmpFile);
                 readStream.pipe<Decipher>(decipher).pipe(writeStream);
 
+                decipher.on('error', function (e) {
+                    reject('文件解密失败: ' + e);
+                });
+
                 readStream.on('error', function(error) { // 写完后，继续读取
                     reject('文件解密失败, 读取源文件失败：' + error)
                 });
